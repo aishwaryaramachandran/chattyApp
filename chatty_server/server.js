@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const SocketServer = require('ws').Server;
 const WebSocket = require('ws');
@@ -53,7 +51,7 @@ wss.on('connection', function connection(ws, req) {
     }
 
     let newMessage = {
-      type: type,
+      type: parsedMessagetype,
       id: uuid,
       username: parsedMessage.username,
       content: parsedMessage.content
