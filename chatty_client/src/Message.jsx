@@ -6,7 +6,7 @@ class Message extends Component {
     return (
     <div className="message">
     <span className="message-username">{this.props.message.username}</span>
-    <span className= {(this.props.message.type == "myMessage") ? "message-content myMessage" : "message-content"}>
+    <span className= "message-content">
     {this.props.message.content}
     </span>
   </div>

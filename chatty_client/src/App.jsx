@@ -4,8 +4,6 @@ import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 import Navbar from './Navbar.jsx';
 
-const uuidv1 = require('uuid/v1');
-
 
 class App extends Component {
 
@@ -16,16 +14,32 @@ class App extends Component {
       messages: []
     }
     this.addMessage = this.addMessage.bind(this);
+    this.changeUsername = this.changeUsername.bind(this);
   } //end of the constructor
 
-  addMessage(username, content,type){
+  currentName(){
+    return this.state.currentUser.name || 'anonymous'
+  }
+
+  addMessage(content){
     let newMessage = {
-      type,
-      id: Date.now(),
-      username,
+      type: "postMessage",
+      username: this.currentName(),
       content
     };
+    this.socket.send(JSON.stringify(newMessage)); // add method to avoid rep
+  }
+
+  changeUsername(name){
+    console.log("[App changeUsername] Name changed:", name);
+    let newMessage = {
+      type: "postNotification",
+      content: `${this.currentName()} changed their name to ${name}`
+    }
     this.socket.send(JSON.stringify(newMessage));
+    this.setState({
+      currentUser:{name}
+    })
   }
 
   componentDidMount() {
@@ -39,17 +53,27 @@ class App extends Component {
 
     this.socket.addEventListener('message', (event) => {
       const newMessage = JSON.parse(event.data);
-      const newMessages = this.state.messages.concat(newMessage);
-       this.setState({
-      messages: newMessages
-      });
+      switch(newMessage.type){
+
+        case "incomingMessage":
+        case "incomingNotification":
+          const newMessages = this.state.messages.concat(newMessage);
+          this.setState({
+            messages: newMessages
+          });
+          break;
+
+        default:
+          console.log("Unrecognized message type")
+
+      }
     });
-}
+  }
 
   render() {
     return (
       <div>
-        <ChatBar currentUser= {this.state.currentUser.name} addMessage= {this.addMessage}/>
+        <ChatBar currentUser={this.state.currentUser.name} changeUsername={this.changeUsername} addMessage={this.addMessage}/>
         <MessageList messages= {this.state.messages}/>
         <Navbar />
       </div>

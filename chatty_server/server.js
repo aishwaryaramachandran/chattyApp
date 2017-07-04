@@ -1,7 +1,7 @@
 const express = require('express');
 const SocketServer = require('ws').Server;
 const WebSocket = require('ws');
-const uuidv1 = require('uuid/v1');
+const uuid = require('uuid/v1');
 // Set the port to 3001
 const PORT = 3001;
 
@@ -23,41 +23,35 @@ wss.broadcast = function broadcast(data) {
 };
 
 wss.on('connection', function connection(ws, req) {
-  let notificationMsg = "This user has changed their name";
-
   console.log('Client connected');
 
   ws.on('message', function incoming(message){
     console.log('message');
     const parsedMessage = JSON.parse(message);
-    let type = 'textMessage';
-    let uuid = uuidv1();
 
-    if (parsedMessage.content[0] == '/') {
+    switch (parsedMessage.type){
+      case "postMessage":
+        let newMessage = {
+          type: "incomingMessage",
+          id: uuid(),
+          username: parsedMessage.username,
+          content: parsedMessage.content
+        };
+        wss.broadcast(JSON.stringify(newMessage));
+        break;
+      case "postNotification":
+        let newNotification = {
+          type: "incomingNotification",
+          id: uuid(),
+          content: parsedMessage.content
+        }
+        wss.broadcast(JSON.stringify(newNotification));
+        break;
+      default:
+        console.log("Unrecognized message type");
 
-      let command = parsedMessage.content.split(' ')[0].replace('/','');
-      switch(command){
-
-        case 'me':
-          type = "myMessage";
-          parsedMessage.content = parsedMessage.content.replace(`/${command} `, '')
-          break;
-
-        default:
-          type = "errorMessage";
-          parsedMessage.content = "There was an error";
-          break;
-      }
     }
 
-    let newMessage = {
-      type: parsedMessagetype,
-      id: uuid,
-      username: parsedMessage.username,
-      content: parsedMessage.content
-    };
-
-   wss.broadcast(JSON.stringify(newMessage));
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
