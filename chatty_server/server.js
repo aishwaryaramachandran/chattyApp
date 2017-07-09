@@ -25,6 +25,15 @@ wss.broadcast = function broadcast(data) {
 wss.on('connection', function connection(ws, req) {
   console.log('Client connected');
 
+  const userCount = wss.clients.size;
+  const userCountObj = {
+    id: uuidv1(),
+    type: 'userCountChanged',
+    userCount: userCount,
+  }
+
+  wss.broadcast(JSON.stringify(userCountObj));
+
   ws.on('message', function incoming(message){
     console.log('message');
     const parsedMessage = JSON.parse(message);
@@ -47,6 +56,11 @@ wss.on('connection', function connection(ws, req) {
         }
         wss.broadcast(JSON.stringify(newNotification));
         break;
+      case "userCountChanged":
+        const userCount = wss.clients.size;
+        wss.broadCast(userCount);
+        break;
+
       default:
         console.log("Unrecognized message type");
 

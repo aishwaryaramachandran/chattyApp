@@ -11,7 +11,8 @@ class App extends Component {
     super(props);
     this.state = {
       currentUser: {name: "Aisha"},
-      messages: []
+      messages: [],
+      userCount: []
     }
     this.addMessage = this.addMessage.bind(this);
     this.changeUsername = this.changeUsername.bind(this);
@@ -62,7 +63,11 @@ class App extends Component {
             messages: newMessages
           });
           break;
-
+        case "userCountChanged":
+          this.setState({
+             userCount: newMessage.userCount
+            });
+          break;
         default:
           console.log("Unrecognized message type")
 
@@ -75,7 +80,7 @@ class App extends Component {
       <div>
         <ChatBar currentUser={this.state.currentUser.name} changeUsername={this.changeUsername} addMessage={this.addMessage}/>
         <MessageList messages= {this.state.messages}/>
-        <Navbar />
+        <Navbar userCount={this.state.userCount}/>
       </div>
     );
   }

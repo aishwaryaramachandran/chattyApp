@@ -76,6 +76,12 @@
       position: fixed;
       right: 0;
       top: 0;
+      .user-count {
+        float: right;
+        margin: 20px;
+        color: #000;
+        font-weight: bold;
+      }
     }
 
     .navbar-brand {
