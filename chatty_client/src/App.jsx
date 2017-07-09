@@ -4,7 +4,7 @@ import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 import Navbar from './Navbar.jsx';
 
-
+// the default name in the app is set using the constructor
 class App extends Component {
 
   constructor(props){
@@ -18,6 +18,8 @@ class App extends Component {
     this.changeUsername = this.changeUsername.bind(this);
   } //end of the constructor
 
+  // this function allows the user to send a
+  //message without a username
   currentName(){
     return this.state.currentUser.name || 'anonymous'
   }
@@ -31,6 +33,7 @@ class App extends Component {
     this.socket.send(JSON.stringify(newMessage)); // add method to avoid rep
   }
 
+  //This function will send a notif message when the user changes their name
   changeUsername(name){
     console.log("[App changeUsername] Name changed:", name);
     let newMessage = {
@@ -52,6 +55,8 @@ class App extends Component {
 
     });
 
+    // this event listener deal with incoming messages, notifications
+    // and changes in the users online
     this.socket.addEventListener('message', (event) => {
       const newMessage = JSON.parse(event.data);
       switch(newMessage.type){

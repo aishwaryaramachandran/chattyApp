@@ -11,7 +11,7 @@ const server = express()
   .use(express.static('public'))
   .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${ PORT }`));
 
-// Create the WebSockets server
+// Creates the WebSockets server
 const wss = new SocketServer({ server });
 
 wss.broadcast = function broadcast(data) {
@@ -24,14 +24,14 @@ wss.broadcast = function broadcast(data) {
 
 wss.on('connection', function connection(ws, req) {
   console.log('Client connected');
-
+// on connection, the number of users are counted
   const userCount = wss.clients.size;
   const userCountObj = {
     id: uuidv1(),
     type: 'userCountChanged',
     userCount: userCount,
   }
-
+   //broadcasting the number of users 'online'
   wss.broadcast(JSON.stringify(userCountObj));
 
   ws.on('message', function incoming(message){
@@ -46,6 +46,7 @@ wss.on('connection', function connection(ws, req) {
           username: parsedMessage.username,
           content: parsedMessage.content
         };
+        // broadcasting the message posted by a user
         wss.broadcast(JSON.stringify(newMessage));
         break;
       case "postNotification":
@@ -54,10 +55,12 @@ wss.on('connection', function connection(ws, req) {
           id: uuid(),
           content: parsedMessage.content
         }
+        //broadcasting a notification if a user changes their name
         wss.broadcast(JSON.stringify(newNotification));
         break;
       case "userCountChanged":
         const userCount = wss.clients.size;
+        //broadcasting when the number of users online has changed
         wss.broadCast(userCount);
         break;
 
